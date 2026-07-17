@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Image Gallery</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Animated Image Gallery</h1>
+
+    <div class="controls">
+        <button id="play-btn">Pause</button>
+        <button id="next-slide">Next</button>
+    </div>
+
+    <div class="gallery">
+        <div class="image-card">
+            <img class="gallery-img" src="image/images.jpg" alt="Gallery image 1" data-full="image/images.jpg">
+        </div>
+        <div class="image-card">
+            <img class="gallery-img" src="image/images (1).jpg" alt="Gallery image 2" data-full="image/images (1).jpg">
+        </div>
+        <div class="image-card">
+            <img class="gallery-img" src="image/images (2).jpg" alt="Gallery image 3" data-full="image/images (2).jpg">
+        </div>
+        <div class="image-card">
+            <img class="gallery-img" src="image/images (3).jpg" alt="Gallery image 4" data-full="image/images (3).jpg">
+        </div>
+        <div class="image-card">
+            <img class="gallery-img" src="image/images (4).jpg" alt="Gallery image 5" data-full="image/images (4).jpg">
+        </div>
+        <div class="image-card">
+            <img class="gallery-img" src="image/images (5).jpg" alt="Gallery image 6" data-full="image/images (5).jpg">
+        </div>
+        <div class="image-card">
+            <img class="gallery-img" src="image/images (6).jpg" alt="Gallery image 7" data-full="image/images (6).jpg">
+        </div>
+        <div class="image-card">
+            <img class="gallery-img" src="image/images.jpg" alt="Gallery image 8" data-full="image/images.jpg">
+        </div>
+        <div class="image-card">
+            <img class="gallery-img" src="image/images.7.jpg" alt="Gallery image 9" data-full="image/images.7.jpg">
+        </div>
+        <div class="image-card">
+            <img class="gallery-img" src="image/images (10).jpg" alt="Gallery image 10" data-full="image/images (10).jpg">
+        </div>
+    </div>
+
+    <div class="lightbox" id="lightbox" role="dialog" aria-label="Image preview">
+        <button class="lightbox-close" id="lightbox-close" aria-label="Close preview">&times;</button>
+        <button class="lightbox-nav prev" id="prev-btn" aria-label="Previous image">&#10094;</button>
+        <img id="lightbox-img" alt="Preview image">
+        <button class="lightbox-nav next" id="next-btn" aria-label="Next image">&#10095;</button>
+    </div>
+
+    <script>
+        const images = Array.from(document.querySelectorAll('.gallery-img'));
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const closeBtn = document.getElementById('lightbox-close');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const playBtn = document.getElementById('play-btn');
+        const nextSlideBtn = document.getElementById('next-slide');
+
+        let currentIndex = 0;
+        let slideshowRunning = true;
+        let slideshowTimer;
+
+        function openLightbox(index) {
+            currentIndex = index;
+            const img = images[currentIndex];
+            lightboxImg.src = img.dataset.full;
+            lightboxImg.onerror = () => {
+                lightboxImg.src = 'image/images.jpg';
+            };
+            lightbox.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function showNext() {
+            currentIndex = (currentIndex + 1) % images.length;
+            const img = images[currentIndex];
+            lightboxImg.src = img.dataset.full;
+            lightboxImg.onerror = () => {
+                lightboxImg.src = 'image/images.jpg';
+            };
+        }
+
+        function showPrev() {
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            const img = images[currentIndex];
+            lightboxImg.src = img.dataset.full;
+            lightboxImg.onerror = () => {
+                lightboxImg.src = 'image/images.jpg';
+            };
+        }
+
+        function startSlideshow() {
+            clearInterval(slideshowTimer);
+            slideshowTimer = setInterval(() => {
+                if (slideshowRunning) {
+                    showNext();
+                }
+            }, 2500);
+        }
+
+        function toggleSlideshow() {
+            slideshowRunning = !slideshowRunning;
+            playBtn.textContent = slideshowRunning ? 'Pause' : 'Play';
+            if (slideshowRunning) {
+                startSlideshow();
+            } else {
+                clearInterval(slideshowTimer);
+            }
+        }
+
+        images.forEach((img, index) => {
+            img.addEventListener('click', () => openLightbox(index));
+        });
+
+        closeBtn.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (event) => {
+            if (event.target === lightbox) closeLightbox();
+        });
+
+        prevBtn.addEventListener('click', showPrev);
+        nextBtn.addEventListener('click', showNext);
+        playBtn.addEventListener('click', toggleSlideshow);
+        nextSlideBtn.addEventListener('click', showNext);
+
+        startSlideshow();
+
+        document.addEventListener('keydown', (event) => {
+            if (!lightbox.classList.contains('show')) return;
+            if (event.key === 'Escape') closeLightbox();
+            if (event.key === 'ArrowRight') showNext();
+            if (event.key === 'ArrowLeft') showPrev();
+        });
+    </script>
+</body>
+</html>
